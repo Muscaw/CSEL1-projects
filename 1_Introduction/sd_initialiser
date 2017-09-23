@@ -1,0 +1,45 @@
+#!/bin/bash
+# sd_initialiser
+# author: Kevin Grandjean
+# date: 23 september 2017
+# This script initialises the sd card with the os generated with buildroot.
+############
+# IMPORTANT:
+# This script needs to be run from the folder where the image to put on the card is.
+############
+
+# Check if user is root
+if [[ $EUID -ne 0 ]]; then
+    echo "This script must be executed as root."
+    exit 1
+fi
+
+
+# Check if argc is 1
+if [[ $# -ne 1 ]]; then
+    echo "This script takes only one argument: path to the SD card."
+    exit 1
+fi
+
+
+for n in "$1*"; do
+    umount $n
+done
+
+# init of the first 128MB
+dd if=/dev/zero of="$1" bs=4k count=32768
+
+
+# Creation of the partitions
+parted "$1" mklabel msdos
+parted "$1" mkpart primary ext4 131072s 2228223s
+parted "$1" mkpart primary ext4 2228224s 4325375s
+mkfs.ext4 "$1" -L -q usrfs
+
+# Firmware burning
+dd if=xu3-bl1.bin of="$1" bs=512 seek=1
+dd if=xu3-bl2.bin of="$1" bs=512 seek=2111
+dd if=xu3-u-boot.bin of="$1" bs=512 seek=63
+dd if=xu3-zImage of="$1" bs=512 seek=6304
+dd if=exynos5422-odroidxu3.dtb bs=512 seek=22688
+dd if=xu3-rootfs.ext4 bs=512 seek=131072
