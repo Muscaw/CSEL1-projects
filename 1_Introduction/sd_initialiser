@@ -25,7 +25,6 @@ fi
 for n in "$1*"; do
     umount $n
 done
-
 # init of the first 128MB
 dd if=/dev/zero of="$1" bs=4k count=32768
 
@@ -34,12 +33,33 @@ dd if=/dev/zero of="$1" bs=4k count=32768
 parted "$1" mklabel msdos
 parted "$1" mkpart primary ext4 131072s 2228223s
 parted "$1" mkpart primary ext4 2228224s 4325375s
-mkfs.ext4 "$1" -L -q usrfs
+
+mkfs.ext4 "${1}1" -L rootfs
+mkfs.ext4 "${1}2" -L usrfs
+sync
 
 # Firmware burning
+echo "BL1"
 dd if=xu3-bl1.bin of="$1" bs=512 seek=1
-dd if=xu3-bl2.bin of="$1" bs=512 seek=2111
+echo "BL2"
+dd if=xu3-bl2.bin of="$1" bs=512 seek=31
+echo "TZSW"
+dd if=xu3-tzsw.bin of="$1" bs=512 seek=2111
+echo "U-Boot"
 dd if=xu3-u-boot.bin of="$1" bs=512 seek=63
+echo "zImage"
 dd if=xu3-zImage of="$1" bs=512 seek=6304
-dd if=exynos5422-odroidxu3.dtb bs=512 seek=22688
-dd if=xu3-rootfs.ext4 bs=512 seek=131072
+echo "exynos"
+dd if=exynos5422-odroidxu3.dtb of="$1" bs=512 seek=22688
+echo "rootfs"
+dd if=xu3-rootfs.ext4 of="$1" bs=512 seek=131072
+echo "Done copying mate"
+sync
+
+
+for n in "$1*"; do
+    umount $n
+done
+
+e2fsck -f "${1}1"
+resize2fs "${1}1"
