@@ -1,0 +1,1 @@
+cmd_/home/lmi/workspace/Labos/Labo3/ex8/mymodule.ko := /home/lmi/workspace/xu3/buildroot/output/host/usr/bin/arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/lmi/workspace/Labos/Labo3/ex8/mymodule.ko /home/lmi/workspace/Labos/Labo3/ex8/mymodule.o /home/lmi/workspace/Labos/Labo3/ex8/mymodule.mod.o
