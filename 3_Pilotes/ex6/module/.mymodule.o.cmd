@@ -1,0 +1,1 @@
+cmd_/home/lmi/workspace/Labos/Labo3/ex6/module/mymodule.o := /home/lmi/workspace/xu3/buildroot/output/host/usr/bin/arm-linux-gnueabihf-ld -EL    -r -o /home/lmi/workspace/Labos/Labo3/ex6/module/mymodule.o /home/lmi/workspace/Labos/Labo3/ex6/module/skeleton.o 
